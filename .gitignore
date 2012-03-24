@@ -1,0 +1,15 @@
+*/Debug/*
+*/build/*
+*/msg_gen/*
+*/docs/*
+vicon_bridge/src/vicon_bridge/cfg/*
+vicon_bridge/src/vicon_bridge/msg/*
+vicon_bridge/src/vicon_bridge/srv/*
+*/srv_gen/*
+*/bin/*
+*/lib/*
+*/cfg/*.cfgc
+*/.cproject
+*/.project
+*/cfg/cpp/*
+
