@@ -161,10 +161,11 @@ private:
   string host_name_;
   string tf_ref_frame_id_;
   string tracked_frame_suffix_;
+  bool broadcast_tf_;
   // Publisher
   ros::Publisher marker_pub_;
   // TF Broadcaster
-  tf::TransformBroadcaster tf_broadcaster_;
+  tf::TransformBroadcaster* tf_broadcaster_;
   //geometry_msgs::PoseStamped vicon_pose;
   tf::Transform flyer_transform;
   ros::Time now_time;
@@ -207,7 +208,7 @@ public:
   ViconReceiver() :
     nh_priv("~"), diag_updater(), min_freq_(0.1), max_freq_(1000),
         freq_status_(diagnostic_updater::FrequencyStatusParam(&min_freq_, &max_freq_)), stream_mode_("ClientPull"),
-        host_name_(""), tf_ref_frame_id_("/world"), tracked_frame_suffix_("vicon"),
+        host_name_(""), tf_ref_frame_id_("/world"), tracked_frame_suffix_("vicon"), broadcast_tf_(true),
         lastFrameNumber(0), frameCount(0), droppedFrameCount(0), frame_datum(0), n_markers(0), n_unlabeled_markers(0),
         marker_data_enabled(false), unlabeled_marker_data_enabled(false), grab_frames_(false)
 
@@ -221,6 +222,7 @@ public:
     nh_priv.param("stream_mode", stream_mode_, stream_mode_);
     nh_priv.param("datastream_hostport", host_name_, host_name_);
     nh_priv.param("tf_ref_frame_id", tf_ref_frame_id_, tf_ref_frame_id_);
+    nh_priv.param("broadcast_tf", broadcast_tf_, broadcast_tf_);
     ROS_ASSERT(init_vicon());
     // Service Server
     ROS_INFO("setting up grab_vicon_pose service server ... ");
@@ -233,6 +235,10 @@ public:
 
     // Publishers
     marker_pub_ = nh.advertise<vicon_bridge::Markers> (tracked_frame_suffix_ + "/markers", 10);
+
+    if (broadcast_tf_)
+      tf_broadcaster_ = new tf::TransformBroadcaster();
+
     startGrabbing();
   }
 
@@ -510,7 +516,8 @@ private:
       }
     }
 
-    tf_broadcaster_.sendTransform(transforms);
+    if (broadcast_tf_)
+      tf_broadcaster_->sendTransform(transforms);
     cnt++;
   }
 
