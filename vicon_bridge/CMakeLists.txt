@@ -46,6 +46,8 @@ target_link_libraries(vicon_bridge msvc_bridge ViconDataStreamSDK_CPP)
 rosbuild_add_executable(calibrate src/calibrate_segment.cpp)
 
 rosbuild_add_executable(tf_distort src/tf_distort.cpp)
+# had to add the following to get compile to work on Fuerte -PMB 5/3/12
+rosbuild_link_boost(tf_distort signals)
 
 rosbuild_add_executable(testclient src/ViconDataStreamSDK_CPPTest.cpp)
 target_link_libraries(testclient ViconDataStreamSDK_CPP)
